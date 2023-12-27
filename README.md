@@ -6,3 +6,5 @@ File-upload-service performs the first stage of validation of the uploaded file,
 
 ### Before you start the service you need to make sure that all data servers are up and running.
 
+### The application port is 8082
+
