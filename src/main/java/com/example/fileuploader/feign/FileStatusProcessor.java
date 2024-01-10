@@ -5,7 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 @Component
-@FeignClient(name = "file-status-processor", url = "http://localhost:8083/status")
+@FeignClient(name = "file-status-processor", url = "${file-status-processor-url}")
 public interface FileStatusProcessor {
     @GetMapping
     FileStatusDTO checkFileStatus(@RequestParam String fileName);

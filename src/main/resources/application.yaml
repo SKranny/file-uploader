@@ -6,10 +6,10 @@ spring:
 
 spring:
   profiles:
-    active: local
+    active: dev
   config:
     import: optional:configserver:http://localhost:8888
   cloud:
     config:
-      enabled: false
+      enabled: true
       fail-fast: true
