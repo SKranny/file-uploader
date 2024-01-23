@@ -10,6 +10,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -31,10 +33,14 @@ class UploaderServiceImplTest {
                 file.hashCode()
         );
 
-        when(fileStatusProcessor.checkFileStatus("file.xls")).thenReturn(new FileStatusDTO(
-                "file.xls",
-                FileProcessStatus.FILE_ACCEPTED)
-        );
+        try {
+            when(fileStatusProcessor.checkFileStatus(file.getBytes())).thenReturn(new FileStatusDTO(
+                    "file.xls",
+                    FileProcessStatus.FILE_ACCEPTED)
+            );
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
 
         assertEquals(responseDTO.getHttpStatus(), uploaderService.doUpload(file).getHttpStatus());
