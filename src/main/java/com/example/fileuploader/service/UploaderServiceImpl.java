@@ -24,7 +24,7 @@ public class UploaderServiceImpl implements UploaderService {
     @Override
     public ResponseDTO doUpload(MultipartFile file) throws UnsupportedFileException{
 
-        if (!isFileHasBeenUploaded(file.getOriginalFilename())){
+        if (!isFileHasBeenUploaded(file.getBytes())){ // проверить по содержимому файла
             fileStatusProcessor.postStatus(new FileStatusDTO(
                     file.getOriginalFilename(),
                     FileProcessStatus.FILE_ACCEPTED)
@@ -33,7 +33,7 @@ public class UploaderServiceImpl implements UploaderService {
 
         if (!file.isEmpty() && isValidFile(file.getOriginalFilename())){
 
-            if (!isFileHasBeenUploaded(file.getOriginalFilename())){
+            if (!isFileHasBeenUploaded(file.getBytes())){
                 kafkaTemplate.send("upload-topic",new FileData(file.getOriginalFilename(), file.getBytes()));
                 kafkaTemplate.send("status-topic", new FileStatusDTO(
                         file.getOriginalFilename(),
@@ -54,9 +54,9 @@ public class UploaderServiceImpl implements UploaderService {
         }
     }
 
-    private boolean isFileHasBeenUploaded(String fileName){
-        FileStatusDTO fileStatusDTO = fileStatusProcessor.checkFileStatus(fileName);
-        return fileStatusProcessor.checkFileStatus(fileName)
+    private boolean isFileHasBeenUploaded(byte[] fileBytes){
+        FileStatusDTO fileStatusDTO = fileStatusProcessor.checkFileStatus(fileBytes);
+        return fileStatusProcessor.checkFileStatus(fileBytes)
                 .getFileStatus().equals(FileProcessStatus.FILE_HAS_BEEN_UPLOADED);
     }
 

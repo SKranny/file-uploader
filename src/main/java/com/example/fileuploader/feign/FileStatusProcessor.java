@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(name = "file-status-processor", url = "${file-status-processor-url}")
 public interface FileStatusProcessor {
     @GetMapping
-    FileStatusDTO checkFileStatus(@RequestParam String fileName);
+    FileStatusDTO checkFileStatus(@RequestParam byte[] fileBytes);
     @PostMapping
     void postStatus(FileStatusDTO fileStatusDTO);
 

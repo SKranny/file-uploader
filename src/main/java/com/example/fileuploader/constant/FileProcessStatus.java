@@ -8,3 +8,4 @@ public enum FileProcessStatus {
     SECOND_VALIDATION_FAILED,
     FILE_HAS_BEEN_UPLOADED
 }
+// SOLID
