@@ -34,9 +34,12 @@ class UploaderServiceImplTest {
         );
 
         try {
-            when(fileStatusProcessor.checkFileStatus(file.getBytes())).thenReturn(new FileStatusDTO(
-                    "file.xls",
-                    FileProcessStatus.FILE_ACCEPTED)
+            when(fileStatusProcessor.checkFileStatus(FileStatusDTO.builder()
+                    .fileBytes(file.getBytes())
+                    .build())).thenReturn(FileStatusDTO.builder()
+                        .fileStatus(FileProcessStatus.FILE_ACCEPTED)
+                        .fileName("file.xls")
+                        .build()
             );
         } catch (IOException e) {
             throw new RuntimeException(e);
