@@ -25,9 +25,10 @@ public class UploaderServiceImpl implements UploaderService {
     public ResponseDTO doUpload(MultipartFile file) throws UnsupportedFileException{
 
         if (!isFileHasBeenUploaded(file.getBytes())){ // проверить по содержимому файла
-            fileStatusProcessor.postStatus(new FileStatusDTO(
-                    file.getOriginalFilename(),
-                    FileProcessStatus.FILE_ACCEPTED)
+            fileStatusProcessor.postStatus(FileStatusDTO.builder()
+                    .fileName(file.getOriginalFilename())
+                    .fileStatus(FileProcessStatus.FILE_ACCEPTED)
+                    .build()
             );
         }
 
@@ -35,17 +36,19 @@ public class UploaderServiceImpl implements UploaderService {
 
             if (!isFileHasBeenUploaded(file.getBytes())){
                 kafkaTemplate.send("upload-topic",new FileData(file.getOriginalFilename(), file.getBytes()));
-                kafkaTemplate.send("status-topic", new FileStatusDTO(
-                        file.getOriginalFilename(),
-                        FileProcessStatus.FIRST_VALIDATION_COMPLETED)
+                kafkaTemplate.send("status-topic", FileStatusDTO.builder()
+                        .fileStatus(FileProcessStatus.FIRST_VALIDATION_COMPLETED)
+                        .fileName(file.getOriginalFilename())
+                        .build()
                 );
             }
 
             return new ResponseDTO(HttpStatus.OK, file.hashCode());
         }else {
-            kafkaTemplate.send("status-topic", new FileStatusDTO(
-                    file.getOriginalFilename(),
-                    FileProcessStatus.FIRST_VALIDATION_FAILED)
+            kafkaTemplate.send("status-topic", FileStatusDTO.builder()
+                    .fileStatus(FileProcessStatus.FIRST_VALIDATION_FAILED)
+                    .fileName(file.getOriginalFilename())
+                    .build()
             );
             throw new UnsupportedFileException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
@@ -55,8 +58,9 @@ public class UploaderServiceImpl implements UploaderService {
     }
 
     private boolean isFileHasBeenUploaded(byte[] fileBytes){
-        FileStatusDTO fileStatusDTO = fileStatusProcessor.checkFileStatus(fileBytes);
-        return fileStatusProcessor.checkFileStatus(fileBytes)
+        return fileStatusProcessor.checkFileStatus(FileStatusDTO.builder()
+                        .fileBytes(fileBytes)
+                        .build())
                 .getFileStatus().equals(FileProcessStatus.FILE_HAS_BEEN_UPLOADED);
     }
 
